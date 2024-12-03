@@ -55,5 +55,13 @@ export const formulas = {
           return presentValue * Math.pow(1 + ratePerPeriod, totalPeriods);
         },
       },
+      futureValueCompoundInterest: {
+        description: "Future Value with Compound Interest",
+        variables: ["presentValue", "annualInterestRate", "timeInYears"],
+        calculate: ({ presentValue, annualInterestRate, timeInYears }) => {
+          const rate = annualInterestRate / 100; // Convert percentage to decimal
+          return presentValue * Math.pow(1 + rate, timeInYears);
+        },
+      },
   };
   
