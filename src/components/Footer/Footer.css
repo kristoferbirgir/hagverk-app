@@ -1,0 +1,15 @@
+.app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure full screen height */
+  }
+  
+  main {
+    flex: 1; /* Push footer to the bottom */
+    margin: 20px auto; /* Center content */
+    max-width: 800px;
+    padding-top: 80px; /* Space below the Navbar */
+    padding-bottom: 20px; /* Space above the Footer */
+    text-align: center;
+  }
+  

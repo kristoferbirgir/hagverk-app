@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ResultDisplay from "../../Shared/ResultDisplay";
+import styles from "./grids.module.css";
 
 const EqualWithdrawalsGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
@@ -28,49 +29,55 @@ const EqualWithdrawalsGrid = ({ formula }) => {
   };
 
   return (
-    <div className="formula-container">
-      <h3>{formula.description}</h3>
-      <div>
-        <label>Present Value:</label>
+    <div className={styles["grid-container"]}>
+      <h3 className={styles["grid-header"]}>{formula.description}</h3>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Present Value:</label>
         <input
           type="number"
           name="presentValue"
+          className={styles["grid-input"]}
           value={inputs.presentValue || ""}
           onChange={handleInputChange}
           placeholder="Enter present value"
         />
       </div>
-      <div>
-        <label>Annual Interest Rate (%):</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Annual Interest Rate (%):</label>
         <input
           type="number"
           name="annualInterestRate"
+          className={styles["grid-input"]}
           value={inputs.annualInterestRate || ""}
           onChange={handleInputChange}
           placeholder="Enter annual interest rate"
         />
       </div>
-      <div>
-        <label>Starting Year (Accumulation Period):</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Starting Year (Accumulation Period):</label>
         <input
           type="number"
           name="startYear"
+          className={styles["grid-input"]}
           value={inputs.startYear || ""}
           onChange={handleInputChange}
           placeholder="Enter years before withdrawal starts"
         />
       </div>
-      <div>
-        <label>Withdrawal Years (e.g., 6,7,8):</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Withdrawal Years (e.g., 6,7,8):</label>
         <input
           type="text"
           name="withdrawalYears"
+          className={styles["grid-input"]}
           value={inputs.withdrawalYears.join(",") || ""}
           onChange={handleInputChange}
           placeholder="Enter years separated by commas"
         />
       </div>
-      <button onClick={calculateEqualWithdrawals}>Calculate</button>
+      <button className={styles["grid-button"]} onClick={calculateEqualWithdrawals}>
+        Calculate
+      </button>
       {result !== null && <ResultDisplay result={result} />}
     </div>
   );

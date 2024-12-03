@@ -23,6 +23,13 @@ import BondPriceGrid from "./grids/BondPriceGrid";
 import PresentValueLoanGrid from "./grids/PresentValueLoanGrid";
 import RealReturnGrid from "./grids/RealReturnGrid";
 import APRLoanGrid from "./grids/APRLoanGrid";
+import SemiAnnualBondGrid from "./grids/SemiAnnualBondGrid.js";
+import BondCashFlowDurationGrid from "./grids/BondCashFlowDurationGrid";
+import BondYieldAndDurationGrid from "./grids/BondYieldAndDurationGrid.js";
+import AnnualizedReturnGrid from "./grids/AnnualizedReturnGrid.js";
+import RekstrarreikningGrid from "./grids/RekstrarreikningGrid.js";
+import CAPMGrid from "./grids/CAPMGrid.js";
+import WACCGrid from "./grids/WACCGrid.js";
 import formulas from "../../utils/formulas";
 
 const Calculator = () => {
@@ -75,6 +82,20 @@ const Calculator = () => {
       case "realReturn":
       return <RealReturnGrid formula={formulas.realReturn} />;
       case "aprLoan": return <APRLoanGrid formula={formulas.aprLoan} />;
+      case "semiAnnualBond":
+      return <SemiAnnualBondGrid formula={formulas.semiAnnualBond} />;
+      case "bondCashFlowWithDuration":
+      return <BondCashFlowDurationGrid formula={formulas.bondCashFlowWithDuration} />;
+      case "bondYieldAndDuration":
+      return <BondYieldAndDurationGrid formula={formulas.bondYieldAndDuration} />;
+      case "annualizedReturn":
+      return <AnnualizedReturnGrid formula={formulas.annualizedReturn} />;
+      case "rekstrarreikning":
+      return <RekstrarreikningGrid formula={formulas.rekstrarreikning} />;
+      case "capm":
+      return <CAPMGrid formula={formulas.capm} />;
+      case "wacc":
+      return <WACCGrid formula={formulas.wacc} />;
 
 
 
@@ -86,7 +107,7 @@ const Calculator = () => {
   return (
     <div className="calculator-container">
       <FormulaSelector selectedFormula={selectedFormula} onSelect={setSelectedFormula} />
-      {renderFormula()}
+      <div className="formula-output">{renderFormula()}</div>
     </div>
   );
 };

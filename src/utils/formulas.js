@@ -473,7 +473,229 @@ export const formulas = {
                 throw new Error("APR calculation did not converge.");
               },
             },
-    
-          
+            semiAnnualBond: {
+              description: "Calculate Semi-Annual Bond Price and Duration",
+              variables: ["faceValue", "couponRate", "yieldRate", "yearsToMaturity"],
+              calculate: ({ faceValue, couponRate, yieldRate, yearsToMaturity }) => {
+                if (!faceValue || !couponRate || !yieldRate || !yearsToMaturity) {
+                  throw new Error("All fields (Face Value, Coupon Rate, Yield Rate, and Years to Maturity) are required.");
+                }
+            
+                const semiAnnualCoupon = (couponRate / 100) * faceValue / 2; // Semi-annual coupon
+                const totalPeriods = yearsToMaturity * 2; // Total semi-annual periods
+                const ratePerPeriod = yieldRate / 100 / 2; // Semi-annual yield
+            
+                let price = 0;
+                let duration = 0;
+            
+                for (let t = 1; t <= totalPeriods; t++) {
+                  const timeInYears = t / 2; // Convert periods to years
+                  const discountFactor = 1 / Math.pow(1 + ratePerPeriod, t);
+                  price += semiAnnualCoupon * discountFactor;
+                  duration += timeInYears * semiAnnualCoupon * discountFactor;
+                }
+            
+                // Add face value discounted to present value
+                const discountFactor = 1 / Math.pow(1 + ratePerPeriod, totalPeriods);
+                price += faceValue * discountFactor;
+                duration += (totalPeriods / 2) * faceValue * discountFactor;
+            
+                duration /= price; // Weighted average time to maturity
+            
+                return { price, duration };
+              },
+            },
+            bondCashFlowWithDuration: {
+              description: "Bond Cash Flow and Average Duration",
+              variables: ["faceValue", "annualInterestRate", "yearsToMaturity", "yieldRate"],
+              calculate: ({ faceValue, annualInterestRate, yearsToMaturity, yieldRate }) => {
+                if (!faceValue || !annualInterestRate || !yearsToMaturity || !yieldRate) {
+                  throw new Error("All fields (Face Value, Interest Rate, Years, and Yield Rate) are required.");
+                }
+            
+                const interestRate = annualInterestRate / 100;
+                const yieldRateDecimal = yieldRate / 100;
+            
+                let totalPrice = 0;
+                let durationNumerator = 0;
+                let durationDenominator = 0;
+                const cashFlows = [];
+            
+                let remainingPrincipal = faceValue / yearsToMaturity;
+            
+                for (let year = 1; year <= yearsToMaturity; year++) {
+                  const interestPayment = faceValue * interestRate;
+                  const totalPayment = remainingPrincipal + interestPayment;
+                  const discountedPayment = totalPayment / Math.pow(1 + yieldRateDecimal, year);
+            
+                  totalPrice += discountedPayment;
+                  durationNumerator += year * discountedPayment;
+                  durationDenominator += discountedPayment;
+            
+                  cashFlows.push({
+                    year,
+                    payment: totalPayment || 0, // Ensure it's a number
+                    discountedPayment: discountedPayment || 0, // Ensure it's a number
+                  });
+            
+                  faceValue -= remainingPrincipal;
+                }
+            
+                const averageDuration = durationDenominator > 0 ? durationNumerator / durationDenominator : 0;
+            
+                return {
+                  totalPrice: totalPrice || 0,
+                  averageDuration: averageDuration || 0,
+                  cashFlows,
+                };
+              },
+            },
+            bondYieldAndDuration: {
+              description: "Calculate Yield Rate and Average Duration",
+              variables: ["faceValue", "annualInterestRate", "yearsToMaturity", "currentPrice"],
+              calculate: ({ faceValue, annualInterestRate, yearsToMaturity, currentPrice }) => {
+                if (!faceValue || !annualInterestRate || !yearsToMaturity || !currentPrice) {
+                  throw new Error("All fields (Face Value, Interest Rate, Years, and Current Price) are required.");
+                }
+            
+                const coupon = (annualInterestRate / 100) * faceValue;
+            
+                // Define function to calculate present value of cash flows for a given yield rate
+                const calculatePresentValue = (yieldRate) => {
+                  let presentValue = 0;
+                  for (let year = 1; year <= yearsToMaturity; year++) {
+                    const cashFlow = year === yearsToMaturity ? coupon + faceValue : coupon;
+                    presentValue += cashFlow / Math.pow(1 + yieldRate, year);
+                  }
+                  return presentValue;
+                };
+            
+                // Solve for yield rate using Newton-Raphson method
+                let yieldRate = 0.05; // Initial guess (5%)
+                for (let i = 0; i < 100; i++) {
+                  const pv = calculatePresentValue(yieldRate);
+                  const derivative = (calculatePresentValue(yieldRate + 0.0001) - pv) / 0.0001; // Numerical derivative
+                  const adjustment = (pv - currentPrice) / derivative;
+                  yieldRate -= adjustment;
+                  if (Math.abs(adjustment) < 1e-6) break;
+                }
+            
+                const yieldRatePercentage = yieldRate * 100;
+            
+                // Calculate average duration
+                let totalPV = 0;
+                let durationNumerator = 0;
+                for (let year = 1; year <= yearsToMaturity; year++) {
+                  const cashFlow = year === yearsToMaturity ? coupon + faceValue : coupon;
+                  const discountedCashFlow = cashFlow / Math.pow(1 + yieldRate, year);
+                  totalPV += discountedCashFlow;
+                  durationNumerator += year * discountedCashFlow;
+                }
+                const averageDuration = durationNumerator / totalPV;
+            
+                return {
+                  yieldRate: yieldRatePercentage.toFixed(2),
+                  averageDuration: averageDuration.toFixed(2),
+                };
+              },
+            },
+            annualizedReturn: {
+              description: "Calculate Annualized Return",
+              variables: ["initialPrice", "finalPrice", "timeInWeeks"],
+              calculate: ({ initialPrice, finalPrice, timeInWeeks }) => {
+                if (!initialPrice || !finalPrice || !timeInWeeks) {
+                  throw new Error("All fields (Initial Price, Final Price, Time in Weeks) are required.");
+                }
+                if (timeInWeeks <= 0) {
+                  throw new Error("Time in Weeks must be greater than zero.");
+                }
+            
+                const rateOfReturn = (finalPrice - initialPrice) / initialPrice;
+                const weeksInYear = 52;
+                const annualizedReturn = Math.pow(1 + rateOfReturn, weeksInYear / timeInWeeks) - 1;
+            
+                return {
+                  annualizedReturn: (annualizedReturn * 100).toFixed(2), // Return as percentage
+                };
+              },
+            },  
+            rekstrarreikning: {
+              description: "Rekstrarreikning Calculation",
+              variables: [
+                "revenue",
+                "expenses",
+                "depreciation",
+                "interestBearingDebt",
+                "interestRate",
+                "taxRate",
+              ],
+              calculate: ({
+                revenue = 0,
+                expenses = 0,
+                depreciation = 0,
+                interestBearingDebt = 0,
+                interestRate = 0,
+                taxRate = 0,
+              }) => {
+                const EBITDA = revenue - expenses;
+                const EBIT = EBITDA - depreciation;
+                const InterestExpenses = interestBearingDebt * (interestRate / 100);
+                const PreTaxIncome = EBIT - InterestExpenses;
+                const Tax = PreTaxIncome * (taxRate / 100);
+                const NetIncome = PreTaxIncome - Tax;
+            
+                return {
+                  EBITDA: EBITDA.toFixed(2),
+                  EBIT: EBIT.toFixed(2),
+                  InterestExpenses: InterestExpenses.toFixed(2),
+                  PreTaxIncome: PreTaxIncome.toFixed(2),
+                  Tax: Tax.toFixed(2),
+                  NetIncome: NetIncome.toFixed(2),
+                };
+              },
+            },
+            capm: {
+              description: "Calculate Expected Return using CAPM",
+              variables: ["riskFreeRate", "beta", "marketReturn"],
+              calculate: ({ riskFreeRate, beta, marketReturn }) => {
+                if (riskFreeRate === undefined || beta === undefined || marketReturn === undefined) {
+                  throw new Error("All fields (Risk-Free Rate, Beta, and Market Return) are required.");
+                }
+            
+                // CAPM formula: E(R) = Rf + Beta * (Rm - Rf)
+                const expectedReturn = riskFreeRate + beta * (marketReturn - riskFreeRate);
+            
+                return {
+                  expectedReturn: expectedReturn.toFixed(2), // Return as percentage
+                };
+              },
+            },
+            wacc: {
+              description: "Calculate Weighted Average Cost of Capital (WACC)",
+              variables: ["costOfEquity", "costOfDebt", "taxRate", "debtRatio"],
+              calculate: ({ costOfEquity, costOfDebt, taxRate, debtRatio }) => {
+                if (
+                  costOfEquity === undefined ||
+                  costOfDebt === undefined ||
+                  taxRate === undefined ||
+                  debtRatio === undefined
+                ) {
+                  throw new Error("All fields (Cost of Equity, Cost of Debt, Tax Rate, and Debt Ratio) are required.");
+                }
+            
+                const equityRatio = 1 - debtRatio;
+                const afterTaxCostOfDebt = costOfDebt * (1 - taxRate / 100);
+            
+                // WACC formula: WACC = (E/V) * Re + (D/V) * Rd * (1 - Tc)
+                const wacc = equityRatio * costOfEquity + debtRatio * afterTaxCostOfDebt;
+            
+                return {
+                  wacc: wacc.toFixed(2), // Return as percentage
+                };
+              },
+            },
+            
+            
+     
   };
   export default formulas;

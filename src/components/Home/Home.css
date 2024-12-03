@@ -1,26 +1,66 @@
+/* Home.css */
 .home-container {
-    text-align: center;
-    padding: 2em;
-    font-family: 'Arial', sans-serif;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .home-heading {
-    color: #2c3e50;
-    margin-bottom: 1em;
-  }
-  
-  .home-paragraph {
-    font-size: 1.2em;
-    line-height: 1.5;
-    color: #34495e;
-  }
-  
-  .home-footer {
-    margin-top: 2em;
-    font-size: 1em;
-    color: #7f8c8d;
-  }
-  
+  text-align: center;
+  padding: 2em;
+  font-family: "Arial", sans-serif;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 800px;
+}
+
+.home-heading {
+  color: #2c3e50;
+  margin-bottom: 1em;
+}
+
+.home-paragraph {
+  font-size: 1.2em;
+  line-height: 1.5;
+  color: #34495e;
+  margin-bottom: 1.5em;
+}
+
+.icon-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.home-icon {
+  transition: transform 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+.home-icon.calculator {
+  color: #007bff; /* Blue for calculator */
+}
+
+.home-icon.calculator:hover {
+  transform: scale(1.2);
+  color: #0056b3;
+}
+
+.home-icon.chart {
+  color: #ff5733; /* Orange for chart */
+}
+
+.home-icon.chart:hover {
+  transform: scale(1.2);
+  color: #e64a19;
+}
+
+.home-icon.money {
+  color: #28a745; /* Green for money */
+}
+
+.home-icon.money:hover {
+  transform: scale(1.2);
+  color: #218838;
+}
+
+.lottie-container {
+  margin-top: 20px;
+}

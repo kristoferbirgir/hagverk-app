@@ -1,19 +1,24 @@
 import React from "react";
+import "./FormulaSelector.css";
 
 const FormulaSelector = ({ selectedFormula, onSelect }) => {
   return (
-    <div>
-      <label>Choose a formula:</label>
-      <select value={selectedFormula} onChange={(e) => onSelect(e.target.value)}>
-        <option value="presentValue">Present Value</option>
-        <option value="futureValue">Future Value</option>
-        <option value="netPresentValue">Net Present Value (NPV)</option>
-        <option value="interestRate">Interest Rate</option>
-        <option value="time">Time</option>
-        <option value="irr">Internal Rate of Return (IRR)</option>
-        <option value="flatInterest">Future Value with Flat Interest</option>
-        <option value="futureValueWithPeriodicCompounding">Future Value with Periodic Compounding</option>
-        <option value="futureValueCompoundInterest">Future Value with Compound Interest</option>
+    <div className="formula-selector">
+      <label className="selector-label">Veldu Formúlu:</label>
+      <select
+        className="formula-dropdown"
+        value={selectedFormula}
+        onChange={(e) => onSelect(e.target.value)}
+      >
+        <option value="presentValue">Núvirði</option>
+        <option value="futureValue">Framtíðarvirði</option>
+        <option value="netPresentValue">Hreint Núvirði (NPV)</option>
+        <option value="interestRate">Vextir</option>
+        <option value="time">Tími</option>
+        <option value="irr">Innri Ávöxtun (IRR)</option>
+        <option value="flatInterest">Framtíðarvirði með Flötum Vöxtum</option>
+        <option value="futureValueWithPeriodicCompounding">Framtíðarvirði með Vaxtatímabilum</option>
+        <option value="futureValueCompoundInterest">Framtíðarvirði með Veldisvöxtum</option>
         <option value="equalWithdrawalsCompoundInterest">Equal Annual Withdrawals (Compound Interest)</option>
         <option value="effectiveInterestRate">Effective Interest Rate</option>
         <option value="loanRepayment">Loan Repayment</option>
@@ -25,9 +30,15 @@ const FormulaSelector = ({ selectedFormula, onSelect }) => {
         <option value="equalPaymentLoanNPV">Equal Payment Loan NPV</option>
         <option value="bondPrice">Bond Price</option>
         <option value="presentValueLoan">Present Value Loan</option>
-        <option value="realReturn">Real Return</option> 
+        <option value="realReturn">Real Return</option>
         <option value="aprLoan">Annual Percentage Rate (APR)</option>
-
+        <option value="semiAnnualBond">Semi-Annual Bond Price and Duration</option>
+        <option value="bondCashFlowWithDuration"> Bond Cash Flow with Average Duration</option>
+        <option value="bondYieldAndDuration">Bond Yield and Average Duration</option>
+        <option value="annualizedReturn">Annualized Return</option>
+        <option value="rekstrarreikning">Rekstrarreikning Calculation</option>
+        <option value="capm">Expected Return (CAPM)</option>
+        <option value="wacc">Weighted Average Cost of Capital (WACC)</option>
       </select>
     </div>
   );
