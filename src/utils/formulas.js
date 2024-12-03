@@ -63,5 +63,33 @@ export const formulas = {
           return presentValue * Math.pow(1 + rate, timeInYears);
         },
       },
+      equalWithdrawals: {
+        description: "Equal Annual Withdrawals (with Dynamic Years)",
+        variables: ["presentValue", "annualInterestRate", "startYear", "withdrawalYears"],
+        calculate: ({ presentValue, annualInterestRate, startYear, withdrawalYears }) => {
+          const rate = annualInterestRate / 100; // Convert percentage to decimal
+      
+          // Future Value after the accumulation period (startYear)
+          const futureValue = presentValue * Math.pow(1 + rate, startYear);
+      
+          // Validate withdrawalYears: all must be greater than startYear
+          const validYears = withdrawalYears.filter((year) => year > startYear);
+          if (validYears.length !== withdrawalYears.length) {
+            throw new Error("All withdrawal years must be greater than the starting year.");
+          }
+      
+          // Calculate the total present value of withdrawals
+          const totalPV = validYears.reduce((total, year) => {
+            const yearIndex = year - startYear; // Number of years from the future value
+            total += Math.pow(1 + rate, -yearIndex); // Discount factor for this year
+            return total;
+          }, 0);
+      
+          // Calculate annual withdrawal amount
+          const annualWithdrawal = futureValue / totalPV;
+      
+          return annualWithdrawal;
+        },
+      },    
   };
   

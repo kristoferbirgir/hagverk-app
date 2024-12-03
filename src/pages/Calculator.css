@@ -6,12 +6,14 @@
   background: #ffffff;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
+  font-family: 'Arial', sans-serif;
 }
 
 .calculator-container h2 {
   text-align: center;
   margin-bottom: 1em;
   color: #2c3e50;
+  font-size: 1.5em;
 }
 
 .calculator-container div {
@@ -20,17 +22,24 @@
 
 label {
   font-weight: bold;
-  margin-right: 1em;
-  display: inline-block;
-  width: 150px;
+  margin-bottom: 0.5em;
+  display: block;
+  color: #34495e;
 }
 
 input {
   padding: 0.5em;
   border: 1px solid #ccc;
   border-radius: 4px;
-  width: calc(100% - 160px);
-  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 0.2em;
+}
+
+input:focus {
+  border-color: #1abc9c;
+  outline: none;
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.4);
 }
 
 button {
@@ -40,14 +49,24 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  display: block;
-  width: 100%;
-  margin-top: 1em;
+  text-align: center;
   font-size: 1em;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
   background-color: #16a085;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
 }
 
 .result-container {
@@ -58,4 +77,95 @@ button:hover {
   text-align: center;
   color: #2c3e50;
   font-weight: bold;
+  font-size: 1.2em;
+}
+
+.result-container h3 {
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  appearance: none;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flex .input-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+input[placeholder] {
+  font-style: italic;
+}
+/* Style for the formula dropdown scrollbar */
+select {
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+  font-family: 'Arial', sans-serif;
+  appearance: none; /* Removes default styles for consistent design */
+}
+
+select:focus {
+  border-color: #1abc9c;
+  outline: none;
+  box-shadow: 0 0 5px rgba(26, 188, 156, 0.4);
+}
+
+/* Custom scrollbar styles */
+select::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
+}
+
+select::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Background of the scrollbar track */
+  border-radius: 5px;
+}
+
+select::-webkit-scrollbar-thumb {
+  background-color: #1abc9c; /* Scrollbar color */
+  border-radius: 5px;
+  border: 2px solid #ffffff; /* Adds spacing between the scrollbar and track */
+}
+
+select::-webkit-scrollbar-thumb:hover {
+  background-color: #16a085; /* Darker color when hovering */
+}
+
+select::-webkit-scrollbar-thumb:active {
+  background-color: #12826c; /* Darker color when clicked */
+}
+
+
+@media (max-width: 768px) {
+  .calculator-container {
+    padding: 1.5em;
+  }
+
+  button {
+    font-size: 0.9em;
+  }
+
+  label {
+    width: 100%;
+    margin-bottom: 0.5em;
+  }
+
+  input {
+    width: 100%;
+  }
 }
