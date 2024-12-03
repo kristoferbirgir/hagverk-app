@@ -16,6 +16,13 @@ import LoanRepaymentGrid from "./grids/LoanRepaymentGrid";
 import FutureValueOfCashFlowsGrid from "./grids/FutureValueOfCashFlowsGrid";
 import EqualPrincipalBondInterestGrid from "./grids/EqualPrincipalBondInterestGrid";
 import EqualPaymentLoanGrid from "./grids/EqualPaymentLoanGrid";
+import EqualPaymentBondGrid from "./grids/EqualPaymentBondGrid";
+import EqualPrincipalLoanNPVGrid from "./grids/EqualPrincipalLoanGrid";
+import EqualPaymentLoanNPVGrid from "./grids/EqualPaymentLoanNPVGrid";
+import BondPriceGrid from "./grids/BondPriceGrid";
+import PresentValueLoanGrid from "./grids/PresentValueLoanGrid";
+import RealReturnGrid from "./grids/RealReturnGrid";
+import APRLoanGrid from "./grids/APRLoanGrid";
 import formulas from "../../utils/formulas";
 
 const Calculator = () => {
@@ -55,6 +62,22 @@ const Calculator = () => {
       return <EqualPrincipalBondInterestGrid formula={formulas.equalPrincipalBondInterest} />;
       case "equalPaymentLoan":
       return <EqualPaymentLoanGrid formula={formulas.equalPaymentLoan} />;
+      case "equalPaymentBond":
+      return <EqualPaymentBondGrid formula={formulas.equalPaymentBond} />;
+      case "equalPrincipalLoanNPV":
+      return <EqualPrincipalLoanNPVGrid formula={formulas.equalPrincipalLoanNPV} />;
+      case "equalPaymentLoanNPV":
+      return <EqualPaymentLoanNPVGrid formula={formulas.equalPaymentLoanNPV} />;
+      case "bondPrice":
+      return <BondPriceGrid formula={formulas.bondPrice} />;
+      case "presentValueLoan":
+      return <PresentValueLoanGrid formula={formulas.presentValueLoan} />;
+      case "realReturn":
+      return <RealReturnGrid formula={formulas.realReturn} />;
+      case "aprLoan": return <APRLoanGrid formula={formulas.aprLoan} />;
+
+
+
 
 
     }

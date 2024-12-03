@@ -278,5 +278,202 @@ export const formulas = {
               throw new Error("Invalid Payment Number.");
             },
           },
+          equalPaymentBond: {
+            description: "Equal Payment Bond (Detailed Breakdown)",
+            variables: ["principal", "annualInterestRate", "years", "targetYear"],
+            calculate: ({ principal, annualInterestRate, years, targetYear }) => {
+              if (!principal || !annualInterestRate || !years || !targetYear) {
+                throw new Error("Please provide Principal, Interest Rate, Years, and Target Year.");
+              }
+              if (targetYear > years) {
+                throw new Error("Target year cannot exceed the loan term.");
+              }
+          
+              const rate = annualInterestRate / 100; // Convert percentage to decimal
+              const PMT = (principal * rate) / (1 - Math.pow(1 + rate, -years)); // Annual payment (PMT)
+          
+              // Calculate remaining principal after the targetYear - 1 payments
+              const remainingPrincipalBeforeTargetYear =
+                principal *
+                Math.pow(1 + rate, targetYear - 1) -
+                (PMT * (Math.pow(1 + rate, targetYear - 1) - 1)) / rate;
+          
+              // Calculate interest and principal for the targetYear
+              const interestPayment = remainingPrincipalBeforeTargetYear * rate;
+              const principalPayment = PMT - interestPayment;
+          
+              return {
+                annualPayment: PMT,
+                interestPayment: interestPayment,
+                principalPayment: principalPayment,
+                remainingPrincipalAfterPayment:
+                  remainingPrincipalBeforeTargetYear - principalPayment,
+              };
+            },
+          },
+          equalPrincipalLoanNPV: {
+            description: "NPV of Equal Principal Loan Payments",
+            variables: ["principal", "annualInterestRate", "years", "discountRate"],
+            calculate: ({ principal, annualInterestRate, years, discountRate }) => {
+              if (!principal || !annualInterestRate || !years || !discountRate) {
+                throw new Error("Please provide Principal, Interest Rate, Years, and Discount Rate.");
+              }
+          
+              const rate = annualInterestRate / 100; // Convert annual interest rate to decimal
+              const discount = discountRate / 100; // Convert discount rate to decimal
+              const principalPayment = principal / years; // Equal principal payment
+              let totalNPV = 0;
+          
+              for (let i = 1; i <= years; i++) {
+                const remainingPrincipal = principal - (principalPayment * (i - 1)); // Remaining principal
+                const interestPayment = remainingPrincipal * rate; // Interest for year i
+                const totalPayment = principalPayment + interestPayment; // Total payment
+                const presentValue = totalPayment / Math.pow(1 + discount, i); // Present value of this payment
+                totalNPV += presentValue;
+              }
+          
+              return totalNPV; // Total NPV of the loan
+            },
+          },
+          equalPaymentLoanNPV: {
+            description: "NPV of Equal Payment Loan",
+            variables: ["principal", "annualInterestRate", "years", "discountRate"],
+            calculate: ({ principal, annualInterestRate, years, discountRate }) => {
+              if (!principal || !annualInterestRate || !years || !discountRate) {
+                throw new Error("Please provide Principal, Interest Rate, Years, and Discount Rate.");
+              }
+          
+              const r = annualInterestRate / 100; // Loan interest rate as decimal
+              const d = discountRate / 100; // Discount rate as decimal
+          
+              // Step 1: Calculate annual payment (A)
+              const annualPayment = (principal * r) / (1 - Math.pow(1 + r, -years));
+          
+              // Step 2: Calculate NPV of loan payments
+              let totalNPV = 0;
+              for (let i = 1; i <= years; i++) {
+                const discountedPayment = annualPayment / Math.pow(1 + d, i);
+                totalNPV += discountedPayment;
+              }
+          
+              return {
+                annualPayment: annualPayment.toFixed(2),
+                npv: totalNPV.toFixed(2),
+              };
+            },
+          },
+          bondPrice: {
+            description: "Calculate Bond Price",
+            variables: ["faceValue", "couponRate", "yields", "yearsToMaturity"],
+            calculate: ({ faceValue, couponRate, yields, yearsToMaturity }) => {
+              if (!faceValue || !couponRate || !yearsToMaturity) {
+                throw new Error("Face Value, Coupon Rate, and Years to Maturity are required inputs.");
+              }
+        
+              if (yields.length !== yearsToMaturity) {
+                throw new Error("Number of yields must match the years to maturity.");
+              }
+        
+              const coupon = (couponRate / 100) * faceValue;
+        
+              // Calculate present value of coupons
+              const presentValueOfCoupons = yields.reduce((sum, yieldRate, index) => {
+                const rate = yieldRate.yield / 100;
+                return sum + coupon / Math.pow(1 + rate, index + 1);
+              }, 0);
+        
+              // Calculate present value of face value
+              const finalYield = yields[yields.length - 1].yield / 100;
+              const presentValueOfFaceValue = faceValue / Math.pow(1 + finalYield, yearsToMaturity);
+        
+              // Total bond price
+              return presentValueOfCoupons + presentValueOfFaceValue;
+            },
+          },
+          
+          presentValueLoan: {
+            description: "Calculate Present Value of a Loan (Jafngreiðslulán)",
+            variables: ["principal", "annualInterestRate", "discountRate", "numPayments"],
+            calculate: ({ principal, annualInterestRate, discountRate, numPayments }) => {
+              if (!principal || !annualInterestRate || !discountRate || !numPayments) {
+                throw new Error("Please fill in all required fields.");
+              }
+          
+              const rate = annualInterestRate / 100;
+              const discount = discountRate / 100;
+          
+              // Calculate Present Value for each payment
+              let presentValue = 0;
+              for (let i = 1; i <= numPayments; i++) {
+                const payment = principal * (rate / (1 - Math.pow(1 + rate, -numPayments)));
+                presentValue += payment / Math.pow(1 + discount, i);
+              }
+          
+              return presentValue;
+            },
+          },
+          realReturn: {
+            description: "Calculate Real Return",
+            variables: ["oldPrice", "newPrice", "oldCPI", "newCPI"],
+            calculate: ({ oldPrice, newPrice, oldCPI, newCPI }) => {
+              if (!oldPrice || !newPrice || !oldCPI || !newCPI) {
+                throw new Error("Please fill in all required fields.");
+              }
+              const nominalReturn = (newPrice - oldPrice) / oldPrice;
+              const inflationRate = (newCPI - oldCPI) / oldCPI;
+              const realReturn = (1 + nominalReturn) / (1 + inflationRate) - 1;
+              return realReturn;
+            },
+          },
+            aprLoan: {
+              description: "Calculate Annual Percentage Rate (APR)",
+              variables: ["loanAmount", "paymentAmount", "numPayments", "loanFee", "paymentFee", "timeInYears"],
+              calculate: ({ loanAmount, paymentAmount, numPayments, loanFee, paymentFee, timeInYears }) => {
+                if (!loanAmount || !paymentAmount || !numPayments || !loanFee || !paymentFee || !timeInYears) {
+                  throw new Error("All inputs must be provided.");
+                }
+          
+                // Calculate net loan amount received by borrower
+                const netLoanAmount = loanAmount - loanFee;
+          
+                // Total payment amount per payment period
+                const totalPayment = paymentAmount + paymentFee;
+          
+                // Iterative approximation to solve for r (APR)
+                const maxIterations = 1000;
+                const tolerance = 1e-6;
+                let apr = 0.1; // Initial guess: 10% APR
+          
+                for (let i = 0; i < maxIterations; i++) {
+                  let npv = 0;
+                  let derivative = 0;
+          
+                  for (let j = 1; j <= numPayments; j++) {
+                    const timeFactor = j * timeInYears / numPayments;
+                    const discountFactor = Math.pow(1 + apr, timeFactor);
+          
+                    npv += totalPayment / discountFactor;
+                    derivative += -(timeFactor * totalPayment) / (discountFactor * (1 + apr));
+                  }
+          
+                  // Add the loan amount (as a negative cash flow)
+                  npv -= netLoanAmount;
+          
+                  if (Math.abs(npv) < tolerance) {
+                    return apr * 100; // Convert APR to percentage
+                  }
+          
+                  apr -= npv / derivative; // Newton's method
+          
+                  if (apr < 0) {
+                    throw new Error("Failed to converge to a valid APR. Check input values.");
+                  }
+                }
+          
+                throw new Error("APR calculation did not converge.");
+              },
+            },
+    
+          
   };
   export default formulas;

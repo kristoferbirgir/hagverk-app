@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ResultDisplay from "../../Shared/ResultDisplay";
 
+
 const FlatInterestGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
     presentValue: "",
