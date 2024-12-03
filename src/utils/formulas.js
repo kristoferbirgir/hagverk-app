@@ -46,5 +46,14 @@ export const formulas = {
           return presentValue + (presentValue * rate * years);
         },
       },
+      futureValueWithPeriodicCompounding: {
+        description: "Calculate Future Value with Periodic Compounding",
+        variables: ["presentValue", "annualInterestRate", "compoundingPeriods", "timeInYears"],
+        calculate: ({ presentValue, annualInterestRate, compoundingPeriods, timeInYears }) => {
+          const ratePerPeriod = annualInterestRate / 100 / compoundingPeriods; // Convert annual rate to periodic rate
+          const totalPeriods = compoundingPeriods * timeInYears; // Total compounding periods
+          return presentValue * Math.pow(1 + ratePerPeriod, totalPeriods);
+        },
+      },
   };
   
