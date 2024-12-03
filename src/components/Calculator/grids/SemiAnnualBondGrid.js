@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import ResultDisplay from "../../Shared/ResultDisplay";
 import styles from "./grids.module.css";
 
 const SemiAnnualBondGrid = ({ formula }) => {
