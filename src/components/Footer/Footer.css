@@ -1,15 +1,49 @@
-.app-container {
+.footer {
+    background-color: #f8f9fa; /* Light gray background */
+    padding: 15px 20px;
+    border-top: 1px solid #e9ecef;
     display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Ensure full screen height */
+    justify-content: center;
+    align-items: center;
   }
   
-  main {
-    flex: 1; /* Push footer to the bottom */
-    margin: 20px auto; /* Center content */
-    max-width: 800px;
-    padding-top: 80px; /* Space below the Navbar */
-    padding-bottom: 20px; /* Space above the Footer */
-    text-align: center;
+  .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1200px; /* Center content with a max width */
+  }
+  
+  .footer-left {
+    text-align: left;
+  }
+  
+  .footer-right {
+    display: flex;
+    gap: 15px; /* Space between icons */
+  }
+  
+  .icon-link {
+    color: #000;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+  }
+  
+  .icon-link:hover {
+    color: #0073b1; /* LinkedIn blue for hover */
+  }
+  
+  @media (max-width: 768px) {
+    .footer-content {
+      flex-direction: column;
+      align-items: center;
+      gap: 10px; /* Space between sections for mobile */
+    }
+  
+    .footer-left,
+    .footer-right {
+      text-align: center;
+    }
   }
   

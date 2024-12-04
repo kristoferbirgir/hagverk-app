@@ -30,6 +30,7 @@ import AnnualizedReturnGrid from "./grids/AnnualizedReturnGrid.js";
 import RekstrarreikningGrid from "./grids/RekstrarreikningGrid.js";
 import CAPMGrid from "./grids/CAPMGrid.js";
 import WACCGrid from "./grids/WACCGrid.js";
+import ForwardRateGrid from "./grids/ForwardRateGrid.js";
 import formulas from "../../utils/formulas";
 
 const Calculator = () => {
@@ -96,10 +97,8 @@ const Calculator = () => {
       return <CAPMGrid formula={formulas.capm} />;
       case "wacc":
       return <WACCGrid formula={formulas.wacc} />;
-
-
-
-
+      case "forwardRate":
+      return <ForwardRateGrid formula={formulas.forwardRate} />;
 
     }
   };

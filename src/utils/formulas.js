@@ -694,8 +694,30 @@ export const formulas = {
                 };
               },
             },
-            
-            
+            forwardRate: {
+              description: "Calculate Forward Rate (1 to 2 Years)",
+              variables: ["interestRate1", "interestRate2", "time1", "time2"],
+              calculate: ({ interestRate1, interestRate2, time1, time2 }) => {
+                if (!interestRate1 || !interestRate2 || !time1 || !time2) {
+                  throw new Error("All fields are required.");
+                }
+                const r1 = interestRate1 / 100; // Convert to decimal
+                const r2 = interestRate2 / 100; // Convert to decimal
+                const t1 = parseFloat(time1);
+                const t2 = parseFloat(time2);
+          
+                if (t2 <= t1) {
+                  throw new Error("Time2 must be greater than Time1.");
+                }
+          
+                // Forward rate formula
+                const forwardRate = ((Math.pow(1 + r2, t2) / Math.pow(1 + r1, t1)) - 1) * (1 / (t2 - t1)) * 100; // Convert back to percentage
+          
+                return {
+                  forwardRate: forwardRate.toFixed(2), // Return as a percentage with 2 decimals
+                };
+              },
+            },    
      
   };
   export default formulas;

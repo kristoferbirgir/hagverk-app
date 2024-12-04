@@ -36,7 +36,7 @@ const NPVGrid = ({ formula }) => {
     <div className={styles["grid-container"]}>
       <h3 className={styles["grid-header"]}>{formula.description}</h3>
       <div>
-        <label className={styles["grid-label"]}>Initial Cost (ISK):</label>
+        <label className={styles["grid-label"]}>Upphafskostnaður:</label>
         <input
           type="number"
           className={styles["grid-input"]}
@@ -59,7 +59,7 @@ const NPVGrid = ({ formula }) => {
         <h4>Cash Flows</h4>
         {cashFlowInputs.map((cashFlow, index) => (
           <div key={index} className={styles["grid-row"]}>
-            <label className={styles["grid-label"]}>Revenue (ISK):</label>
+            <label className={styles["grid-label"]}>Rekstrartekjur:</label>
             <input
               type="number"
               className={styles["grid-input"]}
@@ -68,7 +68,7 @@ const NPVGrid = ({ formula }) => {
               onChange={(e) => handleInputChange(e, index)}
               placeholder="Enter revenue"
             />
-            <label className={styles["grid-label"]}>Cost (ISK):</label>
+            <label className={styles["grid-label"]}>Kostnaður:</label>
             <input
               type="number"
               className={styles["grid-input"]}
@@ -77,7 +77,7 @@ const NPVGrid = ({ formula }) => {
               onChange={(e) => handleInputChange(e, index)}
               placeholder="Enter cost"
             />
-            <label className={styles["grid-label"]}>Year:</label>
+            <label className={styles["grid-label"]}>Tími (Ár):</label>
             <input
               type="number"
               className={styles["grid-input"]}
@@ -89,11 +89,11 @@ const NPVGrid = ({ formula }) => {
           </div>
         ))}
         <button className={styles["grid-button"]} onClick={handleAddCashFlow}>
-          Add Another Cash Flow
+          Bæta við Sjóðstreymi
         </button>
       </div>
       <button className={styles["grid-button"]} onClick={calculateNPV}>
-        Calculate NPV
+        Reikna NPV
       </button>
       {result !== null && <ResultDisplay result={result} />}
     </div>

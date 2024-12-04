@@ -32,7 +32,7 @@ const LoanRepaymentGrid = ({ formula }) => {
     <div className={styles["grid-container"]}>
       <h3 className={styles["grid-header"]}>{formula.description}</h3>
       <div>
-        <label className={styles["grid-label"]}>Loan Amount:</label>
+        <label className={styles["grid-label"]}>Lánaupphæð:</label>
         <input
           type="number"
           className={styles["grid-input"]}
@@ -43,7 +43,7 @@ const LoanRepaymentGrid = ({ formula }) => {
         />
       </div>
       <div>
-        <label className={styles["grid-label"]}>Interest Rate (%):</label>
+        <label className={styles["grid-label"]}>Vextir (%):</label>
         <input
           type="number"
           className={styles["grid-input"]}
@@ -54,7 +54,7 @@ const LoanRepaymentGrid = ({ formula }) => {
         />
       </div>
       <div>
-        <label className={styles["grid-label"]}>Loan Duration (Years):</label>
+        <label className={styles["grid-label"]}>Lánatímabil (Ár):</label>
         <input
           type="number"
           className={styles["grid-input"]}
@@ -65,7 +65,7 @@ const LoanRepaymentGrid = ({ formula }) => {
         />
       </div>
       <div>
-        <label className={styles["grid-label"]}>Payment Year:</label>
+        <label className={styles["grid-label"]}>Greiðsluár:</label>
         <input
           type="number"
           className={styles["grid-input"]}
@@ -76,7 +76,7 @@ const LoanRepaymentGrid = ({ formula }) => {
         />
       </div>
       <button className={styles["grid-button"]} onClick={calculateRepayment}>
-        Calculate Repayment
+        Reikna Endurgreiðslu
       </button>
       {result !== null && <ResultDisplay result={result} />}
     </div>

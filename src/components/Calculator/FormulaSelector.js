@@ -39,6 +39,8 @@ const FormulaSelector = ({ selectedFormula, onSelect }) => {
         <option value="rekstrarreikning">Rekstrarreikning Calculation</option>
         <option value="capm">Expected Return (CAPM)</option>
         <option value="wacc">Weighted Average Cost of Capital (WACC)</option>
+        <option value="forwardRate">Forward Rate (1 to 2 Years)</option>
+
       </select>
     </div>
   );

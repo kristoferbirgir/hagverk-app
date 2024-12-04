@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ResultDisplay from "../../Shared/ResultDisplay";
+import styles from "./grids.module.css";
 
 const PeriodicCompoundingGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
@@ -28,22 +29,31 @@ const PeriodicCompoundingGrid = ({ formula }) => {
   };
 
   return (
-    <div className="formula-container">
-      <h3>{formula.description}</h3>
-      {formula.variables.map((variable) => (
-        <div key={variable}>
-          <label>{variable}:</label>
-          <input
-            type="number"
-            name={variable}
-            value={inputs[variable] || ""}
-            onChange={handleInputChange}
-            placeholder={`Enter ${variable}`}
-          />
+    <div className={styles["grid-container"]}>
+      <h3 className={styles["grid-header"]}>{formula.description}</h3>
+      <div className={styles["grid-section"]}>
+        {formula.variables.map((variable) => (
+          <div className={styles["grid-row"]} key={variable}>
+            <label className={styles["grid-label"]}>{variable}:</label>
+            <input
+              type="number"
+              className={styles["grid-input"]}
+              name={variable}
+              value={inputs[variable] || ""}
+              onChange={handleInputChange}
+              placeholder={`Enter ${variable}`}
+            />
+          </div>
+        ))}
+      </div>
+      <button className={styles["grid-button"]} onClick={calculatePeriodicCompounding}>
+        Calculate
+      </button>
+      {result !== null && (
+        <div className={styles["grid-result"]}>
+          <ResultDisplay result={result} />
         </div>
-      ))}
-      <button onClick={calculatePeriodicCompounding}>Calculate</button>
-      {result !== null && <ResultDisplay result={result} />}
+      )}
     </div>
   );
 };
