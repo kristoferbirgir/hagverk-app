@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import ResultDisplay from "../../Shared/ResultDisplay";
 import styles from "./grids.module.css";
 
-const RealReturnGrid = ({ formula }) => {
+const PEComparisonGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
-    oldPrice: "",
-    newPrice: "",
-    oldCPI: "",
-    newCPI: "",
+    peRatio: "", // P/E Ratio (V/H hlutfall)
+    earnings: "", // Earnings (Hagnaður)
   });
   const [result, setResult] = useState(null);
   const [showExamples, setShowExamples] = useState(false);
@@ -17,10 +15,15 @@ const RealReturnGrid = ({ formula }) => {
     setInputs((prev) => ({ ...prev, [name]: parseFloat(value) || "" }));
   };
 
-  const calculateRealReturn = () => {
+  const calculateValuation = () => {
     try {
-      const result = formula.calculate(inputs);
-      setResult(result);
+      const { peRatio, earnings } = inputs;
+
+      const result = formula.calculate({ peRatio, earnings });
+
+      setResult({
+        valuation: result.valuation.toFixed(2),
+      });
     } catch (error) {
       alert(error.message);
     }
@@ -29,73 +32,56 @@ const RealReturnGrid = ({ formula }) => {
   const examples = [
     {
       description:
-        "Í lok mars 2020 var gengi Arion banka 787. Ári síðar var gengi bankans komið í 935. Á sama tímabili hækkaði vísitala neysluverðs úr 266,1 í 279,9. Hver var raunávöxtun hlutabréfa Arion banka skv. þessum gögnum?",
+        "Fyrirtæki A hefur V/H hlutfall upp á 7,5. Fyrirtæki B mun skila hagnaði upp á 1.200.000. Hvert er virði B m.v. V/H kennitölusamanburðinn?",
       inputs: {
-        oldPrice: 787,
-        newPrice: 935,
-        oldCPI: 266.1,
-        newCPI: 279.9,
+        peRatio: 7.5,
+        earnings: 1200000,
       },
     },
   ];
 
   const applyExample = (exampleInputs) => {
     setInputs(exampleInputs);
-    setResult(null); // Reset result when applying a new example
+    setResult(null);
   };
 
   return (
     <div className={styles["grid-container"]}>
       <h3 className={styles["grid-header"]}>{formula.description}</h3>
-      <div>
-        <label className={styles["grid-label"]}>Old Price:</label>
-        <input
-          type="number"
-          className={styles["grid-input"]}
-          name="oldPrice"
-          value={inputs.oldPrice || ""}
-          onChange={handleInputChange}
-          placeholder="Enter old price"
-        />
-      </div>
-      <div>
-        <label className={styles["grid-label"]}>New Price:</label>
-        <input
-          type="number"
-          className={styles["grid-input"]}
-          name="newPrice"
-          value={inputs.newPrice || ""}
-          onChange={handleInputChange}
-          placeholder="Enter new price"
-        />
-      </div>
-      <div>
-        <label className={styles["grid-label"]}>Old CPI:</label>
-        <input
-          type="number"
-          className={styles["grid-input"]}
-          name="oldCPI"
-          value={inputs.oldCPI || ""}
-          onChange={handleInputChange}
-          placeholder="Enter old CPI"
-        />
-      </div>
-      <div>
-        <label className={styles["grid-label"]}>New CPI:</label>
-        <input
-          type="number"
-          className={styles["grid-input"]}
-          name="newCPI"
-          value={inputs.newCPI || ""}
-          onChange={handleInputChange}
-          placeholder="Enter new CPI"
-        />
-      </div>
-      <button className={styles["grid-button"]} onClick={calculateRealReturn}>
-        Reikna Raunávöxtun
-      </button>
-      {result && <ResultDisplay result={`Real Return: ${(result * 100).toFixed(2)}%`} />}
 
+      {/* Input Fields */}
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>P/E Ratio (V/H hlutfall):</label>
+        <input
+          type="number"
+          className={styles["grid-input"]}
+          name="peRatio"
+          value={inputs.peRatio || ""}
+          onChange={handleInputChange}
+          placeholder="Enter P/E Ratio"
+        />
+      </div>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Earnings (Hagnaður):</label>
+        <input
+          type="number"
+          className={styles["grid-input"]}
+          name="earnings"
+          value={inputs.earnings || ""}
+          onChange={handleInputChange}
+          placeholder="Enter Earnings"
+        />
+      </div>
+
+      <button className={styles["grid-button"]} onClick={calculateValuation}>
+        Calculate Valuation
+      </button>
+
+      {result && (
+        <ResultDisplay result={`Valuation: ${result.valuation} kr.`} />
+      )}
+
+      {/* Examples Section */}
       <div className={styles["examples-container"]}>
         <button
           className={styles["grid-button"]}
@@ -105,7 +91,7 @@ const RealReturnGrid = ({ formula }) => {
         </button>
         {showExamples && (
           <div className={styles["examples-list"]}>
-            <h4>Sýnidæmi:</h4>
+            <h4>Examples:</h4>
             {examples.map((example, index) => (
               <div key={index} className={styles["example-item"]}>
                 <p>{example.description}</p>
@@ -124,4 +110,4 @@ const RealReturnGrid = ({ formula }) => {
   );
 };
 
-export default RealReturnGrid;
+export default PEComparisonGrid;

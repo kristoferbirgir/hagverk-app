@@ -47,7 +47,7 @@ const PeriodicCompoundingGrid = ({ formula }) => {
         ))}
       </div>
       <button className={styles["grid-button"]} onClick={calculatePeriodicCompounding}>
-        Calculate
+        Reikna
       </button>
       {result !== null && (
         <div className={styles["grid-result"]}>

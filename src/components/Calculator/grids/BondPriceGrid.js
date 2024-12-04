@@ -6,92 +6,81 @@ const BondPriceGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
     faceValue: "",
     couponRate: "",
+    yields: [{ year: 1, rate: "" }], // Dynamic list for variable yields
     yearsToMaturity: "",
-    yields: [{ year: 1, yield: "" }], // Array for multiple yields
   });
   const [result, setResult] = useState(null);
-  const [showExamples, setShowExamples] = useState(false); // Toggle for examples
+  const [showExamples, setShowExamples] = useState(false);
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e, index = null) => {
     const { name, value } = e.target;
-    setInputs((prev) => ({ ...prev, [name]: parseFloat(value) || "" }));
-  };
 
-  const handleYearSelection = (selectedYear, newYield) => {
-    const updatedYields = [...inputs.yields];
-    for (let i = selectedYear - 1; i < inputs.yearsToMaturity; i++) {
-      updatedYields[i] = { year: i + 1, yield: newYield };
+    if (name === "yields") {
+      const updatedYields = [...inputs.yields];
+      updatedYields[index].rate = parseFloat(value) || "";
+      setInputs((prev) => ({ ...prev, yields: updatedYields }));
+    } else {
+      setInputs((prev) => ({ ...prev, [name]: parseFloat(value) || "" }));
     }
-    setInputs((prev) => ({ ...prev, yields: updatedYields }));
   };
 
-  const handleYearsToMaturityChange = (e) => {
-    const years = parseInt(e.target.value) || 0;
-    const updatedYields = Array.from({ length: years }, (_, i) => ({
-      year: i + 1,
-      yield: inputs.yields[i]?.yield || "",
+  const addYear = () => {
+    setInputs((prev) => ({
+      ...prev,
+      yields: [...prev.yields, { year: prev.yields.length + 1, rate: "" }],
     }));
-    setInputs((prev) => ({ ...prev, yearsToMaturity: years, yields: updatedYields }));
   };
 
   const calculateBondPrice = () => {
     try {
-      // Validate input
-      if (!inputs.faceValue || !inputs.couponRate || !inputs.yields.length) {
-        throw new Error("Please fill in all required fields.");
-      }
-      if (inputs.yields.length !== inputs.yearsToMaturity) {
-        throw new Error("The number of yields must match the years to maturity.");
-      }
-      const result = formula.calculate(inputs);
-      setResult(result);
+      const { faceValue, couponRate, yields, yearsToMaturity } = inputs;
+
+      const yieldRates = yields.map((yieldItem) => yieldItem.rate);
+      const result = formula.calculate({
+        faceValue,
+        couponRate,
+        yields: yieldRates,
+        yearsToMaturity,
+      });
+
+      setResult({
+        bondPrice: result.toFixed(2),
+      });
     } catch (error) {
       alert(error.message);
     }
   };
 
-  // Example data
   const examples = [
     {
       description:
-        "Skuldabréf á markaði greiðir vexti einu sinni á ári (vaxtagreiðslubréf) og er til þriggja ára. Nafnverð bréfsins er 100 kr. Nafnvextir bréfsins eru 9%. Ef ávöxtunarkrafa til bréfsins er 7% hvert ætti markaðsverð þess að vera?",
+        "Skuldabréf á markaði með nafnvexti 15%, nafnverð 100 kr., og ávöxtunarkröfur árin [13%, 14%, 15%, 16%] í 4 ár. Reiknið markaðsverðið.",
       inputs: {
         faceValue: 100,
-        couponRate: 9,
-        yearsToMaturity: 3,
+        couponRate: 15,
         yields: [
-          { year: 1, yield: 7 },
-          { year: 2, yield: 7 },
-          { year: 3, yield: 7 },
+          { year: 1, rate: 13 },
+          { year: 2, rate: 14 },
+          { year: 3, rate: 15 },
+          { year: 4, rate: 16 },
         ],
+        yearsToMaturity: 4,
       },
     },
-    {
-        description:
-          "Skuldabréf á markaði greiðir vexti einu sinni á ári (vaxtagreiðslubréf) og er til þriggja ára. Nafnverð bréfsins er 100 kr. og nafnvextir bréfsins eru 15%. Ávöxtunarkrafa bréfsins við útgáfu er 15%. Eftir fyrstu vaxtagreiðslu er ávöxtunarkrafan 16%, hvert ætti markaðsverðið að vera þá?",
-        inputs: {
-          faceValue: 100,
-          couponRate: 15,
-          yearsToMaturity: 3,
-          yields: [
-            { year: 1, yield: 15 },
-            { year: 2, yield: 16 },
-            { year: 3, yield: 16 },
-          ],
-        },
-      },
   ];
 
   const applyExample = (exampleInputs) => {
     setInputs(exampleInputs);
-    setResult(null); // Reset result when applying a new example
+    setResult(null);
   };
 
   return (
     <div className={styles["grid-container"]}>
       <h3 className={styles["grid-header"]}>{formula.description}</h3>
-      <div>
-        <label className={styles["grid-label"]}>Face Value (ISK):</label>
+
+      {/* Input Fields */}
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Face Value (Nafnverð):</label>
         <input
           type="number"
           className={styles["grid-input"]}
@@ -101,7 +90,7 @@ const BondPriceGrid = ({ formula }) => {
           placeholder="Enter face value"
         />
       </div>
-      <div>
+      <div className={styles["grid-row"]}>
         <label className={styles["grid-label"]}>Coupon Rate (%):</label>
         <input
           type="number"
@@ -112,40 +101,44 @@ const BondPriceGrid = ({ formula }) => {
           placeholder="Enter coupon rate"
         />
       </div>
-      <div>
+      <div className={styles["grid-section"]}>
+        <h4>Yields (Ávöxtunarkröfur):</h4>
+        {inputs.yields.map((item, index) => (
+          <div className={styles["grid-row"]} key={index}>
+            <label className={styles["grid-label"]}>Year {item.year}:</label>
+            <input
+              type="number"
+              className={styles["grid-input"]}
+              name="yields"
+              value={item.rate || ""}
+              onChange={(e) => handleInputChange(e, index)}
+              placeholder={`Yield for year ${item.year}`}
+            />
+          </div>
+        ))}
+        <button className={styles["grid-button"]} onClick={addYear}>
+          Add Year
+        </button>
+      </div>
+      <div className={styles["grid-row"]}>
         <label className={styles["grid-label"]}>Years to Maturity:</label>
         <input
           type="number"
           className={styles["grid-input"]}
           name="yearsToMaturity"
           value={inputs.yearsToMaturity || ""}
-          onChange={handleYearsToMaturityChange}
+          onChange={handleInputChange}
           placeholder="Enter years to maturity"
         />
       </div>
-      <div>
-        <h4>Ávöxtunarkrafa (Yields)</h4>
-        {inputs.yields.map((yieldEntry, index) => (
-          <div key={index} className={styles["grid-row"]}>
-            <label className={styles["grid-label"]}>
-              Yield for Year {yieldEntry.year} (%):
-            </label>
-            <input
-              type="number"
-              className={styles["grid-input"]}
-              value={yieldEntry.yield || ""}
-              onChange={(e) =>
-                handleYearSelection(yieldEntry.year, parseFloat(e.target.value) || 0)
-              }
-              placeholder={`Enter yield for year ${yieldEntry.year}`}
-            />
-          </div>
-        ))}
-      </div>
+
       <button className={styles["grid-button"]} onClick={calculateBondPrice}>
         Calculate Bond Price
       </button>
-      {result && <ResultDisplay result={`Market Price: ${result.toFixed(2)} ISK`} />}
+
+      {result && (
+        <ResultDisplay result={`Bond Price: ${result.bondPrice} kr.`} />
+      )}
 
       {/* Examples Section */}
       <div className={styles["examples-container"]}>

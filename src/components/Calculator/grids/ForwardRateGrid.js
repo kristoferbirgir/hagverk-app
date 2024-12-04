@@ -3,8 +3,13 @@ import ResultDisplay from "../../Shared/ResultDisplay";
 import styles from "./grids.module.css";
 
 const ForwardRateGrid = ({ formula }) => {
-  const [years, setYears] = useState([{ year: 1, rate: "" }]); // Dynamic list of years and rates
-  const [selectedYears, setSelectedYears] = useState({ startYear: 1, endYear: 2 });
+  const [years, setYears] = useState([
+    { year: 1, rate: 2.5 },
+    { year: 2, rate: 3.5 },
+    { year: 3, rate: 6.0 },
+    { year: 4, rate: 7.5 },
+  ]);
+  const [selectedYears, setSelectedYears] = useState({ startYear: 1, endYear: 3 });
   const [result, setResult] = useState(null);
   const [showExamples, setShowExamples] = useState(false);
 
@@ -40,12 +45,12 @@ const ForwardRateGrid = ({ formula }) => {
   const examples = [
     {
       description:
-        "Meðfylgjandi er tafla sem sýnir vexti á markflokkum eingreiðslubréfa (e. bullet bonds) á skuldabréfamarkaði næstu 4 árin. Reiknið framvirku vextina eftir 1 ár til 2 ára.\n\nÁr\tVextir\n1\t3.0%\n2\t5.0%\n3\t7.0%\n4\t6.0%",
+        "Eftirfarandi eingreiðsluvextir eru gefnir:\n\nÁr\tVextir\n1\t2,50%\n2\t3,50%\n3\t6,00%\n4\t7,50%\n\nHverjir eru 2ja ára framvirkir vextir eftir 1 ár?",
       years: [
-        { year: 1, rate: 3.0 },
-        { year: 2, rate: 5.0 },
-        { year: 3, rate: 7.0 },
-        { year: 4, rate: 6.0 },
+        { year: 1, rate: 2.5 },
+        { year: 2, rate: 3.5 },
+        { year: 3, rate: 6.0 },
+        { year: 4, rate: 7.5 },
       ],
       selectedYears: { startYear: 1, endYear: 3 },
     },
@@ -88,7 +93,10 @@ const ForwardRateGrid = ({ formula }) => {
             className={styles["grid-input"]}
             value={selectedYears.startYear}
             onChange={(e) =>
-              setSelectedYears((prev) => ({ ...prev, startYear: parseInt(e.target.value) || 1 }))
+              setSelectedYears((prev) => ({
+                ...prev,
+                startYear: parseInt(e.target.value) || 1,
+              }))
             }
             placeholder="Enter start year"
           />
@@ -100,7 +108,10 @@ const ForwardRateGrid = ({ formula }) => {
             className={styles["grid-input"]}
             value={selectedYears.endYear}
             onChange={(e) =>
-              setSelectedYears((prev) => ({ ...prev, endYear: parseInt(e.target.value) || 2 }))
+              setSelectedYears((prev) => ({
+                ...prev,
+                endYear: parseInt(e.target.value) || 2,
+              }))
             }
             placeholder="Enter end year"
           />
@@ -111,10 +122,15 @@ const ForwardRateGrid = ({ formula }) => {
       </div>
 
       {result !== null && (
-        <ResultDisplay result={`Forward Rate: ${result.forwardRate ? result.forwardRate.toFixed(2) : "N/A"}%`} />
+        <ResultDisplay
+          result={`Forward Rate: ${
+            typeof result.forwardRate === "number"
+              ? result.forwardRate.toFixed(2) + "%"
+              : "N/A"
+          }`}
+        />
       )}
 
-      {/* Examples Section */}
       <div className={styles["examples-container"]}>
         <button
           className={styles["grid-button"]}

@@ -31,6 +31,12 @@ import RekstrarreikningGrid from "./grids/RekstrarreikningGrid.js";
 import CAPMGrid from "./grids/CAPMGrid.js";
 import WACCGrid from "./grids/WACCGrid.js";
 import ForwardRateGrid from "./grids/ForwardRateGrid.js";
+import RiskFreeRateGrid from "./grids/RiskFreeRateGrid.js";
+import BalanceSheetGrid from "./grids/BalanceSheetGrid.js";
+import FCFFValuationGrid from "./grids/FCFFValuationGrid.js";
+import CashFlowGrid from "./grids/CashFlowGrid.js";
+import PEComparisonGrid from "./grids/PEComparisonGrid.js";
+import PortfolioReturnGrid from "./grids/PortfolioRetrunGrid.js";
 import formulas from "../../utils/formulas";
 
 const Calculator = () => {
@@ -53,7 +59,7 @@ const Calculator = () => {
       case "flatInterest":
         return <FlatInterestGrid formula={formulas.flatInterest} />;
       case "futureValueWithPeriodicCompounding":
-        return <PeriodicCompoundingGrid formula={formulas.futureValueWithPeriodicCompounding} />; // New case
+        return <PeriodicCompoundingGrid formula={formulas.futureValueWithPeriodicCompounding} />; 
       default:
         return <div>Select a formula to begin.</div>;
       case "futureValueCompoundInterest":
@@ -99,7 +105,20 @@ const Calculator = () => {
       return <WACCGrid formula={formulas.wacc} />;
       case "forwardRate":
       return <ForwardRateGrid formula={formulas.forwardRate} />;
+      case "riskFreeRate":
+      return <RiskFreeRateGrid formula={formulas.riskFreeRate} />;
+      case "balanceSheet":
+      return <BalanceSheetGrid />;
+      case "fcffValuation":
+      return <FCFFValuationGrid formula={formulas.fcffValuation} />;
+      case "cashFlowFromOperations":
+      return <CashFlowGrid formula={formulas.cashFlowFromOperations} />;
+      case "peComparison":
+      return <PEComparisonGrid formula={formulas.peComparison} />;
+      case "portfolioReturn":
+      return <PortfolioReturnGrid formula={formulas.portfolioReturn} />;
 
+    
     }
   };
 

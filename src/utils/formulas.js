@@ -363,34 +363,39 @@ export const formulas = {
             },
           },
           bondPrice: {
-            description: "Calculate Bond Price",
+            description: "Calculate Bond Price with Variable Yields",
             variables: ["faceValue", "couponRate", "yields", "yearsToMaturity"],
             calculate: ({ faceValue, couponRate, yields, yearsToMaturity }) => {
-              if (!faceValue || !couponRate || !yearsToMaturity) {
-                throw new Error("Face Value, Coupon Rate, and Years to Maturity are required inputs.");
+              if (!faceValue || !couponRate || !yields || !yearsToMaturity) {
+                throw new Error("Face Value, Coupon Rate, Yields, and Years to Maturity are required inputs.");
               }
-        
+          
               if (yields.length !== yearsToMaturity) {
                 throw new Error("Number of yields must match the years to maturity.");
               }
-        
-              const coupon = (couponRate / 100) * faceValue;
-        
+          
+              const annualCoupon = (couponRate / 100) * faceValue;
+          
               // Calculate present value of coupons
-              const presentValueOfCoupons = yields.reduce((sum, yieldRate, index) => {
-                const rate = yieldRate.yield / 100;
-                return sum + coupon / Math.pow(1 + rate, index + 1);
-              }, 0);
-        
-              // Calculate present value of face value
-              const finalYield = yields[yields.length - 1].yield / 100;
+              let presentValueOfCoupons = 0;
+              for (let t = 1; t <= yearsToMaturity; t++) {
+                const rate = yields[t - 1] / 100; // Convert yield to decimal
+                presentValueOfCoupons += annualCoupon / Math.pow(1 + rate, t);
+                console.log(`Year ${t}: Coupon Discounted = ${annualCoupon / Math.pow(1 + rate, t)}`);
+              }
+          
+              // Calculate present value of the face value
+              const finalYield = yields[yields.length - 1] / 100;
               const presentValueOfFaceValue = faceValue / Math.pow(1 + finalYield, yearsToMaturity);
-        
+              console.log(`Face Value Discounted: ${presentValueOfFaceValue}`);
+          
               // Total bond price
-              return presentValueOfCoupons + presentValueOfFaceValue;
+              const totalBondPrice = presentValueOfCoupons + presentValueOfFaceValue;
+          
+              return totalBondPrice;
             },
           },
-          
+     
           presentValueLoan: {
             description: "Calculate Present Value of a Loan (Jafngreiðslulán)",
             variables: ["principal", "annualInterestRate", "discountRate", "numPayments"],
@@ -695,29 +700,136 @@ export const formulas = {
               },
             },
             forwardRate: {
-              description: "Calculate Forward Rate (1 to 2 Years)",
-              variables: ["interestRate1", "interestRate2", "time1", "time2"],
-              calculate: ({ interestRate1, interestRate2, time1, time2 }) => {
-                if (!interestRate1 || !interestRate2 || !time1 || !time2) {
-                  throw new Error("All fields are required.");
+              description: "Calculate Forward Rate between two years",
+              variables: ["startRate", "endRate", "startYear", "endYear"],
+              calculate: ({ startRate, endRate, startYear, endYear }) => {
+                if (startRate === undefined || endRate === undefined) {
+                  throw new Error("Start rate and end rate are required.");
                 }
-                const r1 = interestRate1 / 100; // Convert to decimal
-                const r2 = interestRate2 / 100; // Convert to decimal
-                const t1 = parseFloat(time1);
-                const t2 = parseFloat(time2);
-          
-                if (t2 <= t1) {
-                  throw new Error("Time2 must be greater than Time1.");
+                const forwardRate = 
+                  ((1 + endRate / 100) ** endYear / (1 + startRate / 100) ** startYear) ** (1 / (endYear - startYear)) - 1;
+                if (isNaN(forwardRate)) {
+                  throw new Error("Calculation error. Please check the inputs.");
                 }
-          
-                // Forward rate formula
-                const forwardRate = ((Math.pow(1 + r2, t2) / Math.pow(1 + r1, t1)) - 1) * (1 / (t2 - t1)) * 100; // Convert back to percentage
-          
+                return { forwardRate: forwardRate * 100 }; // Return as percentage
+              },
+            },
+            riskFreeRate: {
+              description: "Calculate Risk-Free Rate using CAPM",
+              variables: ["expectedReturnA", "expectedReturnB", "betaA", "betaB"],
+              calculate: ({ expectedReturnA, expectedReturnB, betaA, betaB }) => {
+                if (
+                  expectedReturnA === undefined ||
+                  expectedReturnB === undefined ||
+                  betaA === undefined ||
+                  betaB === undefined
+                ) {
+                  throw new Error(
+                    "All fields (Expected Return A, Expected Return B, Beta A, and Beta B) are required."
+                  );
+                }
+            
+                // Solve using CAPM: Rf = (E(Ra) - Beta_a * E(Rb) / Beta_b) / (1 - Beta_a / Beta_b)
+                const numerator =
+                  expectedReturnA - (betaA * expectedReturnB) / betaB;
+                const denominator = 1 - betaA / betaB;
+                const riskFreeRate = numerator / denominator;
+            
                 return {
-                  forwardRate: forwardRate.toFixed(2), // Return as a percentage with 2 decimals
+                  riskFreeRate: riskFreeRate.toFixed(2), // Return as percentage
                 };
               },
-            },    
-     
-  };
+            },          
+            fcffValuation: {
+              description: "Calculate company valuation using the FCFF method",
+              variables: [
+                "fcff", // Array of {year, value}
+                "debt", // Total debt
+                "equity", // Total equity
+                "costOfEquity", // Percentage
+                "interestRate", // Percentage
+                "taxRate", // Percentage
+              ],
+              calculate: ({ fcff, debt, equity, costOfEquity, interestRate, taxRate }) => {
+                if (!fcff.length || !debt || !equity || !costOfEquity || !interestRate || !taxRate) {
+                  throw new Error("All inputs are required for FCFF valuation.");
+                }
+          
+                // Calculate WACC (Weighted Average Cost of Capital)
+                const totalCapital = debt + equity;
+                const equityWeight = equity / totalCapital;
+                const debtWeight = debt / totalCapital;
+          
+                const wacc =
+                  equityWeight * (costOfEquity / 100) +
+                  debtWeight * (interestRate / 100) * (1 - taxRate / 100);
+          
+                // Discounted FCFF Calculation
+                let discountedFCFF = 0;
+                fcff.forEach(({ year, value }) => {
+                  if (!value) {
+                    throw new Error("Please enter FCFF values for all years.");
+                  }
+                  discountedFCFF += value / Math.pow(1 + wacc, year);
+                });
+          
+                return {
+                  discountedFCFF,
+                  wacc: wacc * 100, // Convert to percentage
+                };
+              },
+            },
+            cashFlowFromOperations: {
+              description: "Calculate Cash Flow from Operations",
+              variables: [
+                "operatingCashFlow",
+                "accountsPayableChange",
+                "inventoryChange",
+                "otherAdjustments",
+              ],
+              calculate: ({ operatingCashFlow, accountsPayableChange, inventoryChange, otherAdjustments = 0 }) => {
+                if (operatingCashFlow === undefined) {
+                  throw new Error("Operating Cash Flow is required.");
+                }
+          
+                const cashFlow =
+                  operatingCashFlow +
+                  (accountsPayableChange || 0) -
+                  (inventoryChange || 0) +
+                  (otherAdjustments || 0);
+          
+                return { cashFlow };
+              },
+            },
+            peComparison: {
+              description: "Calculate Valuation Based on P/E Ratio Comparison",
+              variables: ["peRatio", "earnings"],
+              calculate: ({ peRatio, earnings }) => {
+                if (!peRatio || !earnings) {
+                  throw new Error("P/E Ratio and Earnings are required inputs.");
+                }
+            
+                // Valuation formula: Value = P/E Ratio * Earnings
+                const valuation = peRatio * earnings;
+            
+                return { valuation };
+              },
+            },
+            portfolioReturn: {
+              description: "Calculate Portfolio Expected Return",
+              variables: ["returns", "weights"],
+              calculate: ({ returns, weights }) => {
+                if (!returns || !weights || returns.length !== weights.length) {
+                  throw new Error("Returns and weights are required and must have the same length.");
+                }
+            
+                // Calculate portfolio expected return
+                const expectedReturn = returns.reduce((sum, r, i) => sum + r * weights[i], 0);
+            
+                return { expectedReturn };
+              },
+            },
+            
+            
+          };
   export default formulas;

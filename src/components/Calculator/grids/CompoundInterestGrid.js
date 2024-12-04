@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import ResultDisplay from "../../Shared/ResultDisplay";
 import styles from "./grids.module.css";
 
-const FlatInterestGrid = ({ formula }) => {
+const CompoundInterestGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
     presentValue: "",
     annualInterestRate: "",
-    years: "",
+    timeInYears: "",
   });
   const [result, setResult] = useState(null);
+  const [showExamples, setShowExamples] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -18,13 +19,30 @@ const FlatInterestGrid = ({ formula }) => {
     }));
   };
 
-  const calculateFlatInterest = () => {
+  const calculateCompoundInterest = () => {
     try {
       const result = formula.calculate(inputs);
       setResult(result);
     } catch (error) {
       alert(error.message);
     }
+  };
+
+  const examples = [
+    {
+      description:
+        "Ef við leggjum inn 1.000.000 inn á reikning sem gefur 4,25% árlega ávöxtun þá eigum við eftir 30 ár.",
+      inputs: {
+        presentValue: 1000000,
+        annualInterestRate: 4.25,
+        timeInYears: 30,
+      },
+    },
+  ];
+
+  const applyExample = (exampleInputs) => {
+    setInputs(exampleInputs);
+    setResult(null); // Clear result when applying a new example
   };
 
   return (
@@ -43,12 +61,38 @@ const FlatInterestGrid = ({ formula }) => {
           />
         </div>
       ))}
-      <button className={styles["grid-button"]} onClick={calculateFlatInterest}>
+      <button className={styles["grid-button"]} onClick={calculateCompoundInterest}>
         Calculate
       </button>
       {result !== null && <ResultDisplay result={result} />}
+
+      {/* Examples Section */}
+      <div className={styles["examples-container"]}>
+        <button
+          className={styles["grid-button"]}
+          onClick={() => setShowExamples(!showExamples)}
+        >
+          {showExamples ? "Hide Examples" : "Show Examples"}
+        </button>
+        {showExamples && (
+          <div className={styles["examples-list"]}>
+            <h4>Examples:</h4>
+            {examples.map((example, index) => (
+              <div key={index} className={styles["example-item"]}>
+                <p>{example.description}</p>
+                <button
+                  className={styles["grid-button"]}
+                  onClick={() => applyExample(example.inputs)}
+                >
+                  Use Example
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default FlatInterestGrid;
+export default CompoundInterestGrid;

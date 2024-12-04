@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import ResultDisplay from "../../Shared/ResultDisplay";
 import styles from "./grids.module.css";
 
-const RealReturnGrid = ({ formula }) => {
+const RiskFreeRateGrid = ({ formula }) => {
   const [inputs, setInputs] = useState({
-    oldPrice: "",
-    newPrice: "",
-    oldCPI: "",
-    newCPI: "",
+    expectedReturnA: "",
+    expectedReturnB: "",
+    betaA: "",
+    betaB: "",
   });
   const [result, setResult] = useState(null);
   const [showExamples, setShowExamples] = useState(false);
@@ -17,10 +17,10 @@ const RealReturnGrid = ({ formula }) => {
     setInputs((prev) => ({ ...prev, [name]: parseFloat(value) || "" }));
   };
 
-  const calculateRealReturn = () => {
+  const calculateRiskFreeRate = () => {
     try {
-      const result = formula.calculate(inputs);
-      setResult(result);
+      const results = formula.calculate(inputs);
+      setResult(results);
     } catch (error) {
       alert(error.message);
     }
@@ -29,73 +29,81 @@ const RealReturnGrid = ({ formula }) => {
   const examples = [
     {
       description:
-        "Í lok mars 2020 var gengi Arion banka 787. Ári síðar var gengi bankans komið í 935. Á sama tímabili hækkaði vísitala neysluverðs úr 266,1 í 279,9. Hver var raunávöxtun hlutabréfa Arion banka skv. þessum gögnum?",
+        "Eign A er með vænta ávöxtun upp á 13% og eign B upp á 15%. Beta gildi eignar A er 1,5 og eignar B 2,0. Hverjir eru áhættulausir vextir skv. CAPM?",
       inputs: {
-        oldPrice: 787,
-        newPrice: 935,
-        oldCPI: 266.1,
-        newCPI: 279.9,
+        expectedReturnA: 13,
+        expectedReturnB: 15,
+        betaA: 1.5,
+        betaB: 2.0,
       },
     },
   ];
 
   const applyExample = (exampleInputs) => {
     setInputs(exampleInputs);
-    setResult(null); // Reset result when applying a new example
+    setResult(null);
   };
 
   return (
     <div className={styles["grid-container"]}>
       <h3 className={styles["grid-header"]}>{formula.description}</h3>
-      <div>
-        <label className={styles["grid-label"]}>Old Price:</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Expected Return A (%):</label>
         <input
           type="number"
           className={styles["grid-input"]}
-          name="oldPrice"
-          value={inputs.oldPrice || ""}
+          name="expectedReturnA"
+          value={inputs.expectedReturnA || ""}
           onChange={handleInputChange}
-          placeholder="Enter old price"
+          placeholder="Enter expected return for Asset A"
         />
       </div>
-      <div>
-        <label className={styles["grid-label"]}>New Price:</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Expected Return B (%):</label>
         <input
           type="number"
           className={styles["grid-input"]}
-          name="newPrice"
-          value={inputs.newPrice || ""}
+          name="expectedReturnB"
+          value={inputs.expectedReturnB || ""}
           onChange={handleInputChange}
-          placeholder="Enter new price"
+          placeholder="Enter expected return for Asset B"
         />
       </div>
-      <div>
-        <label className={styles["grid-label"]}>Old CPI:</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Beta A:</label>
         <input
           type="number"
           className={styles["grid-input"]}
-          name="oldCPI"
-          value={inputs.oldCPI || ""}
+          name="betaA"
+          value={inputs.betaA || ""}
           onChange={handleInputChange}
-          placeholder="Enter old CPI"
+          placeholder="Enter beta for Asset A"
         />
       </div>
-      <div>
-        <label className={styles["grid-label"]}>New CPI:</label>
+      <div className={styles["grid-row"]}>
+        <label className={styles["grid-label"]}>Beta B:</label>
         <input
           type="number"
           className={styles["grid-input"]}
-          name="newCPI"
-          value={inputs.newCPI || ""}
+          name="betaB"
+          value={inputs.betaB || ""}
           onChange={handleInputChange}
-          placeholder="Enter new CPI"
+          placeholder="Enter beta for Asset B"
         />
       </div>
-      <button className={styles["grid-button"]} onClick={calculateRealReturn}>
-        Reikna Raunávöxtun
+      <button className={styles["grid-button"]} onClick={calculateRiskFreeRate}>
+        Calculate Risk-Free Rate
       </button>
-      {result && <ResultDisplay result={`Real Return: ${(result * 100).toFixed(2)}%`} />}
 
+      {result && (
+        <ResultDisplay
+          result={`Risk-Free Rate: ${
+            result.riskFreeRate ? result.riskFreeRate + "%" : "N/A"
+          }`}
+        />
+      )}
+
+      {/* Examples Section */}
       <div className={styles["examples-container"]}>
         <button
           className={styles["grid-button"]}
@@ -105,7 +113,7 @@ const RealReturnGrid = ({ formula }) => {
         </button>
         {showExamples && (
           <div className={styles["examples-list"]}>
-            <h4>Sýnidæmi:</h4>
+            <h4>Examples:</h4>
             {examples.map((example, index) => (
               <div key={index} className={styles["example-item"]}>
                 <p>{example.description}</p>
@@ -124,4 +132,4 @@ const RealReturnGrid = ({ formula }) => {
   );
 };
 
-export default RealReturnGrid;
+export default RiskFreeRateGrid;

@@ -10,7 +10,7 @@ const Navbar = () => {
       </div>
       <div className={styles.navLinks}>
         <Link to="/calculator" className={styles.navLink}>
-          Calculator
+          Reiknivél
         </Link>
       </div>
     </nav>

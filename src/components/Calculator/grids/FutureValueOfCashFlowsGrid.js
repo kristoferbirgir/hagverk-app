@@ -7,6 +7,7 @@ const FutureValueOfCashFlowsGrid = ({ formula }) => {
   const [discountRate, setDiscountRate] = useState("");
   const [futureYear, setFutureYear] = useState("");
   const [result, setResult] = useState(null);
+  const [showExamples, setShowExamples] = useState(false);
 
   const handleAddCashFlow = () => {
     setCashFlowInputs([...cashFlowInputs, { amount: "", year: "" }]);
@@ -26,6 +27,29 @@ const FutureValueOfCashFlowsGrid = ({ formula }) => {
     } catch (error) {
       alert(error.message);
     }
+  };
+
+  // Example Data
+  const examples = [
+    {
+      description:
+        "Greiðsluflæði gefur 100 eftir tvö ár og 200 eftir 3,5 ár. Framtíðarvirði greiðsluflæðis á ári 3 er m.v. 10% ávöxtunarkröfu.",
+      inputs: {
+        discountRate: 10,
+        futureYear: 3,
+        cashFlows: [
+          { amount: 100, year: 2 },
+          { amount: 200, year: 3.5 },
+        ],
+      },
+    },
+  ];
+
+  const applyExample = (exampleInputs) => {
+    setDiscountRate(exampleInputs.discountRate);
+    setFutureYear(exampleInputs.futureYear);
+    setCashFlowInputs(exampleInputs.cashFlows);
+    setResult(null); // Reset the result
   };
 
   return (
@@ -52,7 +76,7 @@ const FutureValueOfCashFlowsGrid = ({ formula }) => {
         />
       </div>
       <div>
-        <h4>Cash Flows</h4>
+        <h4 className={styles["grid-section"]}>Cash Flows</h4>
         {cashFlowInputs.map((cashFlow, index) => (
           <div key={index} className={styles["grid-row"]}>
             <label className={styles["grid-label"]}>Amount:</label>
@@ -83,6 +107,32 @@ const FutureValueOfCashFlowsGrid = ({ formula }) => {
         Calculate Future Value
       </button>
       {result !== null && <ResultDisplay result={result} />}
+
+      {/* Examples Section */}
+      <div className={styles["examples-container"]}>
+        <button
+          className={styles["toggle-examples-button"]}
+          onClick={() => setShowExamples(!showExamples)}
+        >
+          {showExamples ? "Hide Examples" : "Show Examples"}
+        </button>
+        {showExamples && (
+          <div className={styles["examples-list"]}>
+            <h4>Examples:</h4>
+            {examples.map((example, index) => (
+              <div key={index} className={styles["example-item"]}>
+                <p>{example.description}</p>
+                <button
+                  className={styles["grid-button"]}
+                  onClick={() => applyExample(example.inputs)}
+                >
+                  Use Example
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
