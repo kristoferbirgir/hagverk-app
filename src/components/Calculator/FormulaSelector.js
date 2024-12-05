@@ -46,8 +46,6 @@ const FormulaSelector = ({ selectedFormula, onSelect }) => {
         <option value="cashFlowFromOperations">Handbært Fé frá Rekstri</option>
         <option value="peComparison">V/H Kennitölusamanburður</option>
         <option value="portfolioReturn">Vænt Ávöxtun Safns</option>
-
-
       </select>
     </div>
   );
